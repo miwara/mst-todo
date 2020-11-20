@@ -1,13 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 import { getSnapshot, types } from "mobx-state-tree";
 import { observer } from "mobx-react";
+import { values } from 'mobx';
+
+let id = 1;
+const randomId = () => ++id;
 
 const Todo = types.model({
+  id: types.identifierNumber,
   name: "",
   done: false
 }).actions(self => {
@@ -45,23 +49,46 @@ const RootStore = types.model({
   todos: types.optional(types.map(Todo), {})
 }).actions(self => {
   function addTodo(id, name) {
-    self.todos.set(id, Todo.create({ name }));
+    self.todos.set(id, Todo.create({ id, name }));
   }
 
   return { addTodo };
 });
 
 const store = RootStore.create({
-  users: {}
+  users: {},
+  todos: {
+    "1": {
+      id: id,
+      name: "Eat a cake",
+      done: true
+    }
+  }
 });
 
-store.addTodo(1, "Eat a cake");
-store.todos.get(1).toggle();
-
-ReactDOM.render(
+const App = observer(props => (
   <div>
-    store: {JSON.stringify(getSnapshot(store))}
-  </div>,
+    <button onClick={e => props.store.addTodo(randomId(), "New Task")}>
+      Add Task
+    </button>
+    {values(props.store.todos).map(todo => (
+      <div key={todo.id}>
+        <input
+        type="checkbox"
+        checked={todo.done}
+        onChange={e => todo.toggle()}
+        />
+        <input
+        type="text"
+        value={todo.name}
+        onChange={e => todo.setName(e.target.value)}
+        />
+        </div>
+    ))}
+  </div>
+));
+
+ReactDOM.render(<App store={store} />,
   document.getElementById('root')
 );
 
