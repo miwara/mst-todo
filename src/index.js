@@ -4,6 +4,18 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+import { types } from "mobx-state-tree";
+import { observer } from "mobx-react";
+
+const Todo = types.model({
+  name: "",
+  done: false
+});
+
+const User = types.model({
+  name: "",
+});
+
 ReactDOM.render(
   <React.StrictMode>
     <App />
