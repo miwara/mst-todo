@@ -16,6 +16,18 @@ const User = types.model({
   name: "",
 });
 
+/*
+↑の書き方は↓の書き方のショートカットにすぎない
+const Todo = types.model({
+  name: types.optional(types.string, ""),
+  done: types.optional(types.boolean, false)
+})
+
+const User = types.model({
+  name: types.optional(types.string, "")
+})
+*/
+
 const john = User.create()
 const eat = Todo.create({ name: "eat" })
 
