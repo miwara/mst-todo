@@ -17,7 +17,9 @@ const User = types.model({
 });
 
 const john = User.create()
-const eat = Todo.create()
+const eat = Todo.create({ name: "eat" })
+
+console.log("Eat TODO", getSnapshot(eat))
 
 ReactDOM.render(
   <div>
