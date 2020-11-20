@@ -28,16 +28,20 @@ const User = types.model({
 })
 */
 
-const john = User.create()
-const eat = Todo.create({ name: "eat" })
+const RootStore = types.model({
+  // すぐ下のstoreで定義しているので第二引数はいらない
+  users: types.map(User),
+  // 第二引数は必要
+  todos: types.optional(types.map(Todo), {})
+});
 
-console.log("Eat TODO", getSnapshot(eat))
+const store = RootStore.create({
+  users: {}
+});
 
 ReactDOM.render(
   <div>
-    John: {JSON.stringify(getSnapshot(john))}
-    <br />
-    Eat TODO: {JSON.stringify(getSnapshot(eat))}
+    store: {JSON.stringify(getSnapshot(store))}
   </div>,
   document.getElementById('root')
 );
