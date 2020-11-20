@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-import { types } from "mobx-state-tree";
+import { getSnapshot, types } from "mobx-state-tree";
 import { observer } from "mobx-react";
 
 const Todo = types.model({
@@ -16,10 +16,15 @@ const User = types.model({
   name: "",
 });
 
+const john = User.create()
+const eat = Todo.create()
+
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+  <div>
+    John: {JSON.stringify(getSnapshot(john))}
+    <br />
+    Eat TODO: {JSON.stringify(getSnapshot(eat))}
+  </div>,
   document.getElementById('root')
 );
 
