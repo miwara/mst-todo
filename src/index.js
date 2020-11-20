@@ -10,6 +10,16 @@ import { observer } from "mobx-react";
 const Todo = types.model({
   name: "",
   done: false
+}).actions(self => {
+  function setName(newName) {
+    self.name = newName;
+  }
+
+  function toggle() {
+    self.done = !self.done;
+  }
+
+  return { setName, toggle }
 });
 
 const User = types.model({
@@ -33,11 +43,20 @@ const RootStore = types.model({
   users: types.map(User),
   // 第二引数は必要
   todos: types.optional(types.map(Todo), {})
+}).actions(self => {
+  function addTodo(id, name) {
+    self.todos.set(id, Todo.create({ name }));
+  }
+
+  return { addTodo };
 });
 
 const store = RootStore.create({
   users: {}
 });
+
+store.addTodo(1, "Eat a cake");
+store.todos.get(1).toggle();
 
 ReactDOM.render(
   <div>
