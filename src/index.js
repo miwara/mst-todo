@@ -42,8 +42,15 @@ const User = types.model({
 
 const RootStore = types.model({
   users: types.map(User),
-  todos: types.map(Todo),
-}).actions(self => {
+  todos: types.optional(types.map(Todo), {})
+}).views(self => ({
+  get pendingCount() {
+    return values(self.todos).filter(todo => !todo.done).length
+  },
+  get completedCount() {
+    return values(self.todos).filter(todo => todo.done).length
+  }
+})).actions(self => {
   function addTodo(id, name) {
     self.todos.set(id, Todo.create({ name }));
   }
@@ -76,6 +83,12 @@ const TodoView = observer(props => (
   </div>
 ));
 
+const TodoCounterView = observer(props => (
+  <div>
+    {props.store.pendingCount} pendign, {props.store.completedCount} completed
+  </div>
+));
+
 const AppView = observer(props => (
   <div>
     <button onClick={e => props.store.addTodo(randomId(), "New Task")}>
@@ -84,6 +97,7 @@ const AppView = observer(props => (
     {values(props.store.todos).map(todo => (
       <TodoView todo={todo} />
     ))}
+    <TodoCounterView store={props.store} />
   </div>
 ));
 
