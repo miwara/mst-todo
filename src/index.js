@@ -49,6 +49,9 @@ const RootStore = types.model({
   },
   get completedCount() {
     return values(self.todos).filter(todo => todo.done).length
+  },
+  getTodosWhereDoneIs(done) {
+    return values(self.todos).filter(todo => todo.done === done)
   }
 })).actions(self => {
   function addTodo(id, name) {
@@ -85,7 +88,7 @@ const TodoView = observer(props => (
 
 const TodoCounterView = observer(props => (
   <div>
-    {props.store.pendingCount} pendign, {props.store.completedCount} completed
+    {props.store.pendingCount} pending, {props.store.completedCount} completed
   </div>
 ));
 
