@@ -7,13 +7,11 @@ import { getSnapshot, types } from "mobx-state-tree";
 import { observer } from "mobx-react";
 import { values } from 'mobx';
 
-let id = 1;
-const randomId = () => ++id;
+const randomId = () => Math.floor(Math.random() * 1000).toString(36);
 
 const Todo = types.model({
-  id: types.identifierNumber,
-  name: "",
-  done: false
+  name: types.optional(types.string, ""),
+  done: types.optional(types.boolean, false)
 }).actions(self => {
   function setName(newName) {
     self.name = newName;
@@ -27,7 +25,7 @@ const Todo = types.model({
 });
 
 const User = types.model({
-  name: "",
+  name: types.optional(types.string, ""),
 });
 
 /*
@@ -43,13 +41,11 @@ const User = types.model({
 */
 
 const RootStore = types.model({
-  // すぐ下のstoreで定義しているので第二引数はいらない
   users: types.map(User),
-  // 第二引数は必要
-  todos: types.optional(types.map(Todo), {})
+  todos: types.map(Todo),
 }).actions(self => {
   function addTodo(id, name) {
-    self.todos.set(id, Todo.create({ id, name }));
+    self.todos.set(id, Todo.create({ name }));
   }
 
   return { addTodo };
@@ -59,36 +55,39 @@ const store = RootStore.create({
   users: {},
   todos: {
     "1": {
-      id: id,
       name: "Eat a cake",
       done: true
     }
   }
 });
 
-const App = observer(props => (
+const TodoView = observer(props => (
+  <div>
+    <input
+    type="checkbox"
+    checked={props.todo.done}
+    onChange={e => props.todo.toggle()}
+    />
+    <input
+    type="text"
+    value={props.todo.name}
+    onChange={e => props.todo.setName(e.target.value)}
+    />
+  </div>
+));
+
+const AppView = observer(props => (
   <div>
     <button onClick={e => props.store.addTodo(randomId(), "New Task")}>
       Add Task
     </button>
     {values(props.store.todos).map(todo => (
-      <div key={todo.id}>
-        <input
-        type="checkbox"
-        checked={todo.done}
-        onChange={e => todo.toggle()}
-        />
-        <input
-        type="text"
-        value={todo.name}
-        onChange={e => todo.setName(e.target.value)}
-        />
-        </div>
+      <TodoView todo={todo} />
     ))}
   </div>
 ));
 
-ReactDOM.render(<App store={store} />,
+ReactDOM.render(<AppView store={store} />,
   document.getElementById('root')
 );
 
